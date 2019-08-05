@@ -3,9 +3,8 @@ package config
 import (
 	"io/ioutil"
 
-	"gopkg.in/yaml.v2"
-
 	"github.com/kelseyhightower/envconfig"
+	"gopkg.in/yaml.v2"
 )
 
 // Config contains general app settings
@@ -13,7 +12,7 @@ type Config struct {
 	Mode string `yaml:"mode"`
 }
 
-// RunOptions contains volatile settings from enviroment vars
+// RunOptions contains volatile settings from environment vars
 type RunOptions struct {
 	Port       string
 	ConfigPath string

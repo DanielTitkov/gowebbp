@@ -10,6 +10,6 @@ func ProduceTitle(mode string) (string, error) {
 	case "brazil":
 		return "Oi sim sim sim, oi não não não", nil
 	default:
-		return "", errors.New("Mode is not set")
+		return "", errors.New("mode is not set")
 	}
 }
