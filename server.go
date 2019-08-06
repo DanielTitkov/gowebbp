@@ -1,12 +1,10 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
 	"net/http"
 
-	"github.com/DanielTitkov/gowebbp/app"
 	"github.com/DanielTitkov/gowebbp/config"
+	hd "github.com/DanielTitkov/gowebbp/handlers"
 	lg "github.com/DanielTitkov/gowebbp/logger"
 
 	"go.uber.org/zap"
@@ -20,32 +18,9 @@ func requestLogger(handler http.Handler, logger *zap.SugaredLogger) http.Handler
 		})
 }
 
-func sampleHandler(w http.ResponseWriter, _ *http.Request, logger *zap.SugaredLogger, mode string) {
-	title, err := app.ProduceTitle(mode)
-	if err == nil {
-		fmt.Fprintf(w, title)
-	} else {
-		fmt.Fprintf(w, "Some error occurred")
-		logger.Error(err)
-	}
-}
-
-func funkyHandler(w http.ResponseWriter, _ *http.Request, logger *zap.SugaredLogger) {
-	fmt.Fprintf(w, "<h1>Papa’s Got a Brand New Bag</h1>")
-}
-
-func jsonHandler(w http.ResponseWriter, _ *http.Request, logger *zap.SugaredLogger) {
-	foods := app.GetFoods()
-	w.Header().Set("Content-Type", "application/json")
-	err := json.NewEncoder(w).Encode(foods)
-	if err != nil {
-		logger.Errorf("JSON encoding failed: %v", err)
-	}
-}
-
 func main() {
 	// build logger
-	logger, err := lg.CreateLogger("logger.json")
+	logger, err := lg.CreateLogger("./configuration_files/logger.json")
 	if err != nil {
 		panic(err)
 	}
@@ -63,9 +38,9 @@ func main() {
 	}
 
 	logger.Infof("Server is listening at port %s", runOpts.Port)
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { sampleHandler(w, r, logger, conf.Mode) })
-	http.HandleFunc("/funky", func(w http.ResponseWriter, r *http.Request) { funkyHandler(w, r, logger) })
-	http.HandleFunc("/foods", func(w http.ResponseWriter, r *http.Request) { jsonHandler(w, r, logger) })
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { hd.SampleHandler(w, r, logger, conf.Mode) })
+	http.HandleFunc("/funky", func(w http.ResponseWriter, r *http.Request) { hd.FunkyHandler(w, r, logger) })
+	http.HandleFunc("/foods", func(w http.ResponseWriter, r *http.Request) { hd.JSONHandler(w, r, logger) })
 
 	mux := http.DefaultServeMux
 	err = http.ListenAndServe(":"+runOpts.Port, requestLogger(mux, logger))
